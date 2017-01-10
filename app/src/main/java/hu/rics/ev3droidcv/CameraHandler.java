@@ -13,6 +13,8 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.List;
 
+import static android.R.attr.x;
+
 /**
  * Created by rics on 2017.01.10..
  */
@@ -47,11 +49,13 @@ public class CameraHandler implements CvCameraViewListener2 {
 
         mDetector.process(mRgba);
         List<MatOfPoint> contours = mDetector.getContours();
-        Log.e(MainActivity.TAG, "Contours count: " + contours.size());
+        Log.i(MainActivity.TAG, "Contours count: " + contours.size());
         Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
         Point center = mDetector.getCenterOfMaxContour();
         if( center != null ) {
             Imgproc.drawMarker(mRgba, center, MARKER_COLOR);
+            double direction = (center.y - mRgba.rows()/2)/mRgba.rows(); // landscape orientation
+            Log.i(MainActivity.TAG, "direction: " + direction);
         }
 
         return mRgba;
