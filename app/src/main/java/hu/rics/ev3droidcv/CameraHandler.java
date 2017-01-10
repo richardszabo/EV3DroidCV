@@ -75,13 +75,15 @@ public class CameraHandler implements CvCameraViewListener2 {
         Log.i(MainActivity.TAG, "Contours count: " + contours.size());
         Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
         Point center = mDetector.getCenterOfMaxContour();
+        double direction = 0;
         if( center != null ) {
             Imgproc.drawMarker(mRgba, center, MARKER_COLOR);
-            double direction = (center.x - mRgba.cols()/2)/mRgba.cols(); // portrait orientation
+            direction = (center.x - mRgba.cols()/2)/mRgba.cols(); // portrait orientation
             Log.i(MainActivity.TAG, "direction: " + direction);
         }
         int font = FONT_HERSHEY_SIMPLEX;
         if( ev3Communicator.isConnected() ) {
+            ev3Communicator.sendDirection(direction);
             font = FONT_HERSHEY_DUPLEX;
         }
         Imgproc.putText(mRgba,ipAddress,org,font,1,TEXT_COLOR);

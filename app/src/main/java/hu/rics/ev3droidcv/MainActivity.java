@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                 case LoaderCallbackInterface.SUCCESS:
                     Log.i(TAG,"OpenCV Manager Connected");
                     mOpenCvCameraView.enableView();
-                    //ev3Communicator.execute();
+                    ev3Communicator.execute();
                     break;
                 default:
                     Log.i(TAG,"OpenCV Manager Install");

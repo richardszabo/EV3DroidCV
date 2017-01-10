@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static android.R.attr.direction;
+
 /**
  * Created by rics on 2017.01.10..
  */
@@ -58,9 +60,25 @@ public class EV3Communicator extends AsyncTask<Void, Void, Boolean>  {
     }
 
     /**
+     * Sending direction info to EV3.
+     *
+     * @param direction value in [-0.5,0.5]
+     */
+    public void sendDirection(double direction) {
+        if( isConnected() ) {
+            try {
+                out.writeDouble(direction);
+            } catch (IOException e) {
+                Log.e(MainActivity.TAG,"Cannot send.");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
      * Get IP address from first non-localhost interface
      * taken from here: http://stackoverflow.com/a/13007325/21047
-     * @param ipv4  true=return ipv4, false=return ipv6
+     * @param useIPv4  true=return ipv4, false=return ipv6
      * @return  address or empty string
      */
     public static String getIPAddress(boolean useIPv4) throws SocketException {
