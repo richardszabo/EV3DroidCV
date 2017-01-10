@@ -11,9 +11,11 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.net.SocketException;
 import java.util.List;
 
 import static android.R.attr.x;
+import static org.opencv.core.Core.FONT_HERSHEY_DUPLEX;
 import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
 import static org.xmlpull.v1.XmlPullParser.TEXT;
 
@@ -30,11 +32,8 @@ public class CameraHandler implements CvCameraViewListener2 {
     private Scalar MARKER_COLOR;
     private Scalar TEXT_COLOR;
     private String ipAddress;
+    private EV3Communicator ev3Communicator;
     private Point org;
-
-    public void setIpAddress(String address) {
-        ipAddress = address;
-    }
 
     @Override
     public void onCameraViewStarted(int width, int height) {
@@ -46,6 +45,12 @@ public class CameraHandler implements CvCameraViewListener2 {
         MARKER_COLOR = new Scalar(0,0,255,255);
         TEXT_COLOR = new Scalar(255,255,255,255);
         org = new Point(1,20);
+        try {
+            ipAddress = EV3Communicator.getIPAddress(true);
+        } catch (SocketException e) {
+            Log.e(MainActivity.TAG, "Cannot get IP address");
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -67,8 +72,16 @@ public class CameraHandler implements CvCameraViewListener2 {
             double direction = (center.y - mRgba.rows()/2)/mRgba.rows(); // landscape orientation
             Log.i(MainActivity.TAG, "direction: " + direction);
         }
-        Imgproc.putText(mRgba,ipAddress,org,FONT_HERSHEY_SIMPLEX,1,TEXT_COLOR);
+        int font = FONT_HERSHEY_SIMPLEX;
+        if( ev3Communicator.isConnected() ) {
+            font = FONT_HERSHEY_DUPLEX;
+        }
+        Imgproc.putText(mRgba,ipAddress,org,font,1,TEXT_COLOR);
 
         return mRgba;
+    }
+
+    public void setEV3Communicator(EV3Communicator ev3Communicator) {
+        this.ev3Communicator = ev3Communicator;
     }
 }

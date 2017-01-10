@@ -43,6 +43,20 @@ public class EV3Communicator extends AsyncTask<Void, Void, Boolean>  {
         return false;
     }
 
+    @Override
+    public void onPostExecute(Boolean result) {
+        super.onPostExecute(result);
+
+        if( result ) {
+            isConnected = true;
+        }
+        Log.i(MainActivity.TAG,"Connect state:" + isConnected);
+    }
+
+    boolean isConnected() {
+        return isConnected;
+    }
+
     /**
      * Get IP address from first non-localhost interface
      * taken from here: http://stackoverflow.com/a/13007325/21047

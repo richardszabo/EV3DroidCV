@@ -40,12 +40,7 @@ public class MainActivity extends AppCompatActivity {
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         cameraHandler = new CameraHandler();
         ev3Communicator = new EV3Communicator();
-        try {
-            cameraHandler.setIpAddress(EV3Communicator.getIPAddress(true));
-        } catch (SocketException e) {
-            Log.e(TAG, "Cannot get IP address");
-            e.printStackTrace();
-        }
+        cameraHandler.setEV3Communicator(ev3Communicator);
         mOpenCvCameraView.setCvCameraViewListener(cameraHandler);
     }
 
