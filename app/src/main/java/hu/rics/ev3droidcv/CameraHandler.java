@@ -7,6 +7,7 @@ import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
@@ -22,6 +23,7 @@ public class CameraHandler implements CvCameraViewListener2 {
     private ColorBlobDetector    mDetector;
     private Scalar               mBlobColorHsv;
     private Scalar CONTOUR_COLOR;
+    private Scalar MARKER_COLOR;
 
 
     @Override
@@ -31,6 +33,7 @@ public class CameraHandler implements CvCameraViewListener2 {
         mBlobColorHsv = new Scalar(60/2,0.6*255,0.8*255,255); // hue in [0,180], saturation in [0,255], value in [0,255]
         mDetector.setHsvColor(mBlobColorHsv);
         CONTOUR_COLOR = new Scalar(255,0,0,255);
+        MARKER_COLOR = new Scalar(0,0,255,255);
     }
 
     @Override
@@ -46,6 +49,10 @@ public class CameraHandler implements CvCameraViewListener2 {
         List<MatOfPoint> contours = mDetector.getContours();
         Log.e(MainActivity.TAG, "Contours count: " + contours.size());
         Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+        Point center = mDetector.getCenterOfMaxContour();
+        if( center != null ) {
+            Imgproc.drawMarker(mRgba, center, MARKER_COLOR);
+        }
 
         return mRgba;
     }

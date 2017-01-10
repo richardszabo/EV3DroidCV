@@ -6,14 +6,17 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.Moments;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
+import static android.os.Build.VERSION_CODES.M;
 
 // taken from opencv sample color-blob-detector
 public class ColorBlobDetector {
@@ -24,8 +27,8 @@ public class ColorBlobDetector {
     private static double mMinContourArea = 0.1;
     // Color radius for range checking in HSV color space
     private Scalar mColorRadius = new Scalar(25,50,50,0);
-    private Mat mSpectrum = new Mat();
     private List<MatOfPoint> mContours = new ArrayList<MatOfPoint>();
+    private MatOfPoint maxContour;
 
     // Cache
     Mat mPyrDownMat = new Mat();
@@ -33,10 +36,6 @@ public class ColorBlobDetector {
     Mat mMask = new Mat();
     Mat mDilatedMask = new Mat();
     Mat mHierarchy = new Mat();
-
-    public void setColorRadius(Scalar radius) {
-        mColorRadius = radius;
-    }
 
     public void setHsvColor(Scalar hsvColor) {
         double minH = (hsvColor.val[0] >= mColorRadius.val[0]) ? hsvColor.val[0]-mColorRadius.val[0] : 0;
@@ -53,23 +52,6 @@ public class ColorBlobDetector {
 
         mLowerBound.val[3] = 0;
         mUpperBound.val[3] = 255;
-
-        Mat spectrumHsv = new Mat(1, (int)(maxH-minH), CvType.CV_8UC3);
-
-        for (int j = 0; j < maxH-minH; j++) {
-            byte[] tmp = {(byte)(minH+j), (byte)255, (byte)255};
-            spectrumHsv.put(0, j, tmp);
-        }
-
-        Imgproc.cvtColor(spectrumHsv, mSpectrum, Imgproc.COLOR_HSV2RGB_FULL, 4);
-    }
-
-    public Mat getSpectrum() {
-        return mSpectrum;
-    }
-
-    public void setMinContourArea(double area) {
-        mMinContourArea = area;
     }
 
     public void process(Mat rgbaImage) {
@@ -86,14 +68,17 @@ public class ColorBlobDetector {
         Imgproc.findContours(mDilatedMask, contours, mHierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         // Find max contour area
+        maxContour = null;
         double maxArea = 0;
         Iterator<MatOfPoint> each = contours.iterator();
         int i = 0;
         while (each.hasNext()) {
             MatOfPoint wrapper = each.next();
             double area = Imgproc.contourArea(wrapper);
-            if (area > maxArea)
+            if (area > maxArea) {
                 maxArea = area;
+                maxContour = wrapper;
+            }
         }
 
         // Filter contours by area and resize to fit the original image size
@@ -111,4 +96,14 @@ public class ColorBlobDetector {
     public List<MatOfPoint> getContours() {
         return mContours;
     }
+
+    public Point getCenterOfMaxContour() {
+        Point center = null;
+        if( maxContour != null ) {
+            Moments moments = Imgproc.moments(maxContour);
+            center = new Point(moments.get_m10() / moments.get_m00(), moments.get_m01() / moments.get_m00());
+        }
+        return center;
+    }
+
 }
