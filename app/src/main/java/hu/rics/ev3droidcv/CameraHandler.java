@@ -4,6 +4,7 @@ import android.util.Log;
 
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
+import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -25,7 +26,7 @@ import static org.xmlpull.v1.XmlPullParser.TEXT;
 
 public class CameraHandler implements CvCameraViewListener2 {
 
-    private Mat                  mRgba;
+    private Mat                  mRgba, mRgbaF, mRgbaT;
     private ColorBlobDetector    mDetector;
     private Scalar               mBlobColorHsv;
     private Scalar CONTOUR_COLOR;
@@ -38,6 +39,8 @@ public class CameraHandler implements CvCameraViewListener2 {
     @Override
     public void onCameraViewStarted(int width, int height) {
         mRgba = new Mat(height, width, CvType.CV_8UC4);
+        mRgbaF = new Mat(height, width, CvType.CV_8UC4);
+        mRgbaT = new Mat(width, width, CvType.CV_8UC4);  // NOTE width,width is NOT a typo
         mDetector = new ColorBlobDetector();
         mBlobColorHsv = new Scalar(60/2,0.6*255,0.8*255,255); // hue in [0,180], saturation in [0,255], value in [0,255]
         mDetector.setHsvColor(mBlobColorHsv);
@@ -61,6 +64,11 @@ public class CameraHandler implements CvCameraViewListener2 {
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         mRgba = inputFrame.rgba();
+        // Rotate mRgba 90 degrees
+        Core.transpose(mRgba, mRgbaT);
+        Imgproc.resize(mRgbaT, mRgbaF, mRgbaF.size(), 0,0, 0);
+        Core.flip(mRgbaF, mRgba, 1 );
+        //
 
         mDetector.process(mRgba);
         List<MatOfPoint> contours = mDetector.getContours();
@@ -69,7 +77,7 @@ public class CameraHandler implements CvCameraViewListener2 {
         Point center = mDetector.getCenterOfMaxContour();
         if( center != null ) {
             Imgproc.drawMarker(mRgba, center, MARKER_COLOR);
-            double direction = (center.y - mRgba.rows()/2)/mRgba.rows(); // landscape orientation
+            double direction = (center.x - mRgba.cols()/2)/mRgba.cols(); // portrait orientation
             Log.i(MainActivity.TAG, "direction: " + direction);
         }
         int font = FONT_HERSHEY_SIMPLEX;
