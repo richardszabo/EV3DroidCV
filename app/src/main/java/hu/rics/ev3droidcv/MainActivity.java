@@ -16,6 +16,9 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 
+import java.net.SocketException;
+
+import static hu.rics.ev3droidcv.EV3Communicator.getIPAddress;
 import static org.opencv.android.OpenCVLoader.initDebug;
 
 public class MainActivity extends AppCompatActivity {
@@ -23,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG = "EV3DroidCV";
     private CameraHandler cameraHandler;
     private CameraBridgeViewBase mOpenCvCameraView;
+    private EV3Communicator ev3Communicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +39,14 @@ public class MainActivity extends AppCompatActivity {
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.ev3droid_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         cameraHandler = new CameraHandler();
+        ev3Communicator = new EV3Communicator();
+        try {
+            cameraHandler.setIpAddress(EV3Communicator.getIPAddress(true));
+        } catch (SocketException e) {
+            Log.e(TAG, "Cannot get IP address");
+            e.printStackTrace();
+        }
         mOpenCvCameraView.setCvCameraViewListener(cameraHandler);
-
     }
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
@@ -46,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
                 case LoaderCallbackInterface.SUCCESS:
                     Log.i(TAG,"OpenCV Manager Connected");
                     mOpenCvCameraView.enableView();
+                    //ev3Communicator.execute();
                     break;
                 default:
                     Log.i(TAG,"OpenCV Manager Install");

@@ -14,6 +14,8 @@ import org.opencv.imgproc.Imgproc;
 import java.util.List;
 
 import static android.R.attr.x;
+import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
+import static org.xmlpull.v1.XmlPullParser.TEXT;
 
 /**
  * Created by rics on 2017.01.10..
@@ -26,7 +28,13 @@ public class CameraHandler implements CvCameraViewListener2 {
     private Scalar               mBlobColorHsv;
     private Scalar CONTOUR_COLOR;
     private Scalar MARKER_COLOR;
+    private Scalar TEXT_COLOR;
+    private String ipAddress;
+    private Point org;
 
+    public void setIpAddress(String address) {
+        ipAddress = address;
+    }
 
     @Override
     public void onCameraViewStarted(int width, int height) {
@@ -36,6 +44,8 @@ public class CameraHandler implements CvCameraViewListener2 {
         mDetector.setHsvColor(mBlobColorHsv);
         CONTOUR_COLOR = new Scalar(255,0,0,255);
         MARKER_COLOR = new Scalar(0,0,255,255);
+        TEXT_COLOR = new Scalar(255,255,255,255);
+        org = new Point(1,20);
     }
 
     @Override
@@ -57,6 +67,7 @@ public class CameraHandler implements CvCameraViewListener2 {
             double direction = (center.y - mRgba.rows()/2)/mRgba.rows(); // landscape orientation
             Log.i(MainActivity.TAG, "direction: " + direction);
         }
+        Imgproc.putText(mRgba,ipAddress,org,FONT_HERSHEY_SIMPLEX,1,TEXT_COLOR);
 
         return mRgba;
     }
