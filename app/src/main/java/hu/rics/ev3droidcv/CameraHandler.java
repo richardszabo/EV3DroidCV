@@ -83,7 +83,9 @@ public class CameraHandler implements CvCameraViewListener2 {
         }
         int font = FONT_HERSHEY_SIMPLEX;
         if( ev3Communicator.isConnected() ) {
-            ev3Communicator.sendDirection(direction);
+            if( center != null ) {
+                ev3Communicator.sendDirection(direction); // sending only when yellow is found
+            }
             font = FONT_HERSHEY_DUPLEX;
         }
         Imgproc.putText(mRgba,ipAddress,org,font,1,TEXT_COLOR);
