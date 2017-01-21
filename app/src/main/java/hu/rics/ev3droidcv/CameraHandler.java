@@ -42,7 +42,7 @@ public class CameraHandler implements CvCameraViewListener2 {
         mRgbaF = new Mat(height, width, CvType.CV_8UC4);
         mRgbaT = new Mat(width, width, CvType.CV_8UC4);  // NOTE width,width is NOT a typo
         mDetector = new ColorBlobDetector();
-        mBlobColorHsv = new Scalar(60/2,0.6*255,0.8*255,255); // hue in [0,180], saturation in [0,255], value in [0,255]
+        mBlobColorHsv = new Scalar(280/2,0.65*255,0.75*255,255); // hue in [0,180], saturation in [0,255], value in [0,255]
         mDetector.setHsvColor(mBlobColorHsv);
         CONTOUR_COLOR = new Scalar(255,0,0,255);
         MARKER_COLOR = new Scalar(0,0,255,255);
@@ -88,7 +88,7 @@ public class CameraHandler implements CvCameraViewListener2 {
         int font = FONT_HERSHEY_SIMPLEX;
         if( ev3Communicator.isConnected() ) {
             if( center == null ) {
-                direction = -100; // sending extreme value when yellow is not found
+                direction = -100; // sending extreme value when blue is not found
             }
             ev3Communicator.sendDirection(direction);
             font = FONT_HERSHEY_DUPLEX;
