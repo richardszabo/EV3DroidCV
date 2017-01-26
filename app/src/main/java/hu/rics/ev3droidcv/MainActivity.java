@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.ev3droid_surface_view);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-        cameraHandler = new CameraHandler();
+        cameraHandler = new CameraHandler(this);
         ev3Communicator = new EV3Communicator();
         cameraHandler.setEV3Communicator(ev3Communicator);
         mOpenCvCameraView.setCvCameraViewListener(cameraHandler);
