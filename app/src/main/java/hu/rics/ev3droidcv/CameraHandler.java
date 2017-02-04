@@ -2,10 +2,7 @@ package hu.rics.ev3droidcv;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import org.opencv.android.CameraBridgeViewBase;
@@ -19,8 +16,6 @@ import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -30,11 +25,8 @@ import java.net.SocketException;
 import java.util.List;
 
 import static android.R.attr.path;
-import static android.R.attr.x;
-import static android.os.Environment.getExternalStoragePublicDirectory;
 import static org.opencv.core.Core.FONT_HERSHEY_DUPLEX;
 import static org.opencv.core.Core.FONT_HERSHEY_SIMPLEX;
-import static org.xmlpull.v1.XmlPullParser.TEXT;
 
 /**
  * Created by rics on 2017.01.10..
@@ -57,7 +49,7 @@ public class CameraHandler implements CvCameraViewListener2 {
 
     public CameraHandler(Activity parent) {
         this.parent = parent;
-        storageDir = parent.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        /*storageDir = parent.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         if( storageDir.exists() ) {
             String[] children = storageDir.list();
             for (int i = 0; i < children.length; i++)
@@ -66,7 +58,7 @@ public class CameraHandler implements CvCameraViewListener2 {
             }
         } else {
             storageDir.mkdir();
-        }
+        }*/
     }
 
     @Override
@@ -127,7 +119,7 @@ public class CameraHandler implements CvCameraViewListener2 {
             font = FONT_HERSHEY_DUPLEX;
         }
         Imgproc.putText(mRgba,ipAddress,org,font,1,TEXT_COLOR);
-        saveMatToImage(mRgba,"ball");
+        //saveMatToImage(mRgba,"ball");
 
         return mRgba;
     }

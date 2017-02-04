@@ -1,6 +1,5 @@
 package hu.rics.ev3droidcv;
 
-import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,14 +11,6 @@ import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-import org.opencv.core.Scalar;
-
-import java.net.SocketException;
-
-import static hu.rics.ev3droidcv.EV3Communicator.getIPAddress;
-import static org.opencv.android.OpenCVLoader.initDebug;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -2,7 +2,6 @@ package hu.rics.ev3droidcv;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -13,50 +12,66 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
-
-import static android.R.attr.direction;
 
 /**
  * Created by rics on 2017.01.10..
  */
 
-public class EV3Communicator extends AsyncTask<Void, Void, Boolean>  {
+public class EV3Communicator {
 
-    private static ServerSocket socket;
-    private static Socket conn;
-    public static DataOutputStream out;
-    private boolean isConnected = false;
+    private static ConnectTask connectTask;
 
-    @Override
-    protected Boolean doInBackground(Void... params) {
-        try {
-            Log.i(MainActivity.TAG,"Serversocket creation");
-            socket = new ServerSocket(1234);
-            Log.i(MainActivity.TAG,"accepting");
-            conn = socket.accept();
-            Log.i(MainActivity.TAG,"stream");
-            out = new DataOutputStream(conn.getOutputStream());
-            return true;
-        } catch (IOException e) {
-            Log.e(MainActivity.TAG, e.getMessage());
-            Log.e(MainActivity.TAG, e.getCause().toString());
-        }
-        return false;
+    EV3Communicator() {
+        connectTask = new ConnectTask();
     }
 
-    @Override
-    public void onPostExecute(Boolean result) {
-        super.onPostExecute(result);
-
-        if( result ) {
-            isConnected = true;
+    class ConnectTask extends AsyncTask<Void, Void, Boolean> {
+        private ServerSocket socket;
+        private Socket conn;
+        private DataOutputStream out;
+        private boolean isConnected = false;
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            try {
+                Log.i(MainActivity.TAG, "Serversocket creation");
+                socket = new ServerSocket(1234);
+                Log.i(MainActivity.TAG, "accepting connection");
+                conn = socket.accept();
+                out = new DataOutputStream(conn.getOutputStream());
+                return true;
+            } catch (IOException e) {
+                Log.e(MainActivity.TAG, e.getMessage());
+                Log.e(MainActivity.TAG, e.getCause().toString());
+            }
+            return false;
         }
-        Log.i(MainActivity.TAG,"Connect state:" + isConnected);
+
+        @Override
+        public void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+
+            if (result) {
+                isConnected = true;
+            }
+            Log.i(MainActivity.TAG, "Connect state:" + isConnected);
+        }
+
+        void close() {
+            try {
+                out.close();
+                socket.close();
+            } catch (IOException e) {
+                Log.e(MainActivity.TAG, "Cannot close connection");
+            }
+        }
     }
 
     boolean isConnected() {
-        return isConnected;
+        return connectTask.isConnected;
+    }
+
+    void execute() {
+        connectTask.execute();
     }
 
     /**
@@ -67,10 +82,13 @@ public class EV3Communicator extends AsyncTask<Void, Void, Boolean>  {
     public void sendDirection(double direction) {
         if( isConnected() ) {
             try {
-                out.writeDouble(direction);
+                connectTask.out.writeDouble(direction);
             } catch (IOException e) {
-                Log.e(MainActivity.TAG,"Cannot send.");
-                e.printStackTrace();
+                Log.e(MainActivity.TAG,"Cannot send, connection terminated");
+                connectTask.close();
+                // restarting connection
+                connectTask = new ConnectTask();
+                connectTask.execute();
             }
         }
     }
